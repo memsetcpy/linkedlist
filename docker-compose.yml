@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+    frontend:
+        build:
+            context: ./frontend/
+            target: prod
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./frontend:/app
+            - /app/node_modules
+        stdin_open: true
+        command: npm start
+    frontend-test:
+        build:
+            context: ./frontend/
+            target: test
+        volumes:
+            - /app/node_modules
+        environment:
+            - CI=true
+        command: npm run test
+    backend:
+        build: ./backend/
+        environment:
+            FLASK_APP: app.py
+            FLASK_DEBUG: 1
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "5000:5000"
+        extra_hosts:
+              - "host.docker.internal:host-gateway"
+        volumes:
+            - ./backend/:/usr/app
+            - /var/run/docker.sock:/var/run/docker.sock
